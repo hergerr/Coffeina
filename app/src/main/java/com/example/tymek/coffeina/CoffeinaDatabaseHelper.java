@@ -13,8 +13,8 @@ public class CoffeinaDatabaseHelper extends SQLiteOpenHelper{
     private static final String DB_NAME = "coffeina";
     private static final int DB_VERSION = 1;
 
-    public CoffeinaDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    public CoffeinaDatabaseHelper(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
 
@@ -31,7 +31,7 @@ public class CoffeinaDatabaseHelper extends SQLiteOpenHelper{
     private void updateMyDatabase(SQLiteDatabase db, int oldVersion, int newVersion){
         if(oldVersion < 1){
             db.execSQL("CREATE TABLE DRINK (_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    " NAME TEXT," +
+                    "NAME TEXT," +
                     "DESCRIPTION TEXT," +
                     "IMAGE_RESOURCE_ID INTEGER);");
             insertDrink(db, "Latte", "Czarne espresso z gorącym mlekiem i mleczną pianką",
@@ -43,7 +43,7 @@ public class CoffeinaDatabaseHelper extends SQLiteOpenHelper{
         }
 
         if(oldVersion < 2){
-            db.execSQL("ALTER TABLE DRINK ADD COLUMN FAVOURITE NUMERIC");
+            db.execSQL("ALTER TABLE DRINK ADD COLUMN FAVOURITE NUMERIC;");
         }
     }
 
@@ -51,7 +51,7 @@ public class CoffeinaDatabaseHelper extends SQLiteOpenHelper{
         ContentValues drinkValues = new ContentValues();
         drinkValues.put("NAME", name);
         drinkValues.put("DESCRIPTION", description);
-        drinkValues.put("IMAGE_RESOURCE", resourceId);
+        drinkValues.put("IMAGE_RESOURCE_ID", resourceId);
         db.insert("DRINK", null, drinkValues);
     }
 }
