@@ -1,19 +1,22 @@
 package com.example.tymek.coffeina;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class DrinkActivity extends Activity {
 
-    //public static final String EXTRA_DRINKNO = "drinkNo";
+    public static final String EXTRA_DRINKNO = "drinkNo";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,14 +24,14 @@ public class DrinkActivity extends Activity {
         setContentView(R.layout.activity_drink);
 
         // w hf uzyto zmiennej statyczne extra_drinkno
-        int drinkNumber = (Integer) getIntent().getExtras().get("id");
+        int drinkNumber = (Integer) getIntent().getExtras().get(EXTRA_DRINKNO);
 
         try{
             SQLiteOpenHelper coffeinaDatabaseHelper = new CoffeinaDatabaseHelper(this);
-            SQLiteDatabase db = coffeinaDatabaseHelper.getReadableDatabase();
+            SQLiteDatabase db = coffeinaDatabaseHelper.getWritableDatabase();
             Cursor cursor = db.query("DRINK",
                                     new String[]{"NAME", "DESCRIPTION",
-                                                "IMAGE_RESOURCE_ID"},
+                                                "IMAGE_RESOURCE_ID", "FAVORITE"},
                                     "_id = ?",
                                     new String[]{Integer.toString(drinkNumber)},
                                     null,null,null);
@@ -37,6 +40,7 @@ public class DrinkActivity extends Activity {
                 String nameText = cursor.getString(0);
                 String descriptionText = cursor.getString(1);
                 int photoId = cursor.getInt(2);
+                boolean isFavorite = (cursor.getInt(3) == 1);
 
                 TextView name =  (TextView)findViewById(R.id.name);
                 name.setText(nameText);
@@ -47,10 +51,37 @@ public class DrinkActivity extends Activity {
                 ImageView photo = (ImageView)findViewById(R.id.photo);
                 photo.setImageResource(photoId);
                 photo.setContentDescription(nameText);
+
+
+                CheckBox favorite = (CheckBox)findViewById(R.id.favorite);
+                favorite.setChecked(isFavorite);
+
             }
             cursor.close();
             db.close();
         }catch (SQLiteException e){
+            Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    public void onFavoriteClicked(View view){
+        int drinkNo = (Integer)getIntent().getExtras().get(EXTRA_DRINKNO);
+        CheckBox favorite = (CheckBox)findViewById(R.id.favorite);
+
+        ContentValues drinkValues = new ContentValues();
+
+        drinkValues.put("FAVORITE", favorite.isChecked());
+
+        SQLiteOpenHelper coffeinaDatabaseHelper =
+                new CoffeinaDatabaseHelper(DrinkActivity.this);
+        try {
+            SQLiteDatabase db = coffeinaDatabaseHelper.getWritableDatabase();
+            db.update("DRINK", drinkValues,
+                    "_id = ?", new String[]{Integer.toString(drinkNo)});
+            db.close();
+        } catch (SQLiteException e){
+            e.printStackTrace();
             Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
         }

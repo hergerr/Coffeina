@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Coffeina</string>
     <string name="starbuzz_logo">Logo kafaterii Coffeina</string>
+    <string name="favorities">Twoje ulubione napoje</string>
+    <string name="favorite">Ulubiony</string>
     <string-array name="options">
         <item>Napoje</item>
         <item>Przekąski</item>

@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class CoffeinaDatabaseHelper extends SQLiteOpenHelper{
     private static final String DB_NAME = "coffeina";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public CoffeinaDatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -43,7 +43,7 @@ public class CoffeinaDatabaseHelper extends SQLiteOpenHelper{
         }
 
         if(oldVersion < 2){
-            db.execSQL("ALTER TABLE DRINK ADD COLUMN FAVOURITE NUMERIC;");
+            db.execSQL("ALTER TABLE DRINK ADD COLUMN FAVORITE NUMERIC;");
         }
     }
 
