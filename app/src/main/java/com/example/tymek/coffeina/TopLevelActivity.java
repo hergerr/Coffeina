@@ -3,6 +3,7 @@ package com.example.tymek.coffeina;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -19,6 +20,28 @@ public class TopLevelActivity extends Activity {
     private SQLiteDatabase db;
     private Cursor favoritesCursor;
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        try{
+            CoffeinaDatabaseHelper coffeinaDatabaseHelper = new CoffeinaDatabaseHelper(this);
+            db = coffeinaDatabaseHelper.getReadableDatabase();
+            Cursor newCursor = db.query("DRINK",
+                    new String[] {"_id", "NAME"},
+                    "FAVORITE = 1",
+                    null,null,null,null);
+            ListView listFavourities = (ListView)findViewById(R.id.list_favorities);
+            CursorAdapter adapter = (CursorAdapter) listFavourities.getAdapter();
+
+            adapter.changeCursor(newCursor);
+            favoritesCursor = newCursor;
+        }catch (SQLException e){
+            e.printStackTrace();
+            Toast toast = Toast.makeText(this,"Baza danych jest niedostępna", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
